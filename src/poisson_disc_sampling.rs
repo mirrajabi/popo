@@ -117,7 +117,6 @@ pub fn sample(
     );
     let mut grid = vec![0; size];
 
-    let border_grid = calculate_border(&polygon, min_x, min_y, sample_w, sample_h, cell_size);
     let mut points = Vec::<Vec2>::new();
     let mut active_list = Vec::<Vec2>::new();
 
@@ -175,7 +174,6 @@ pub fn sample(
                     r,
                     &points,
                     &grid,
-                    &border_grid,
                     index_fn,
                 ) {
                     points.push(candidate);
@@ -234,7 +232,6 @@ fn is_valid<IndexFn>(
     r: f32,
     points: &[Vec2],
     grid: &[usize],
-    border_grid: &[bool],
     index_fn: IndexFn,
 ) -> bool
 where
@@ -260,56 +257,9 @@ where
         }
     }
 
-    if border_grid[index_fn(cell_x, cell_y)] && !is_in_polygon(candidate, polygon) {
+    if !is_in_polygon(candidate, polygon) {
         return false;
     }
 
     true
-}
-
-fn calculate_border(
-    polygon: &[Vec2],
-    start_x: f32,
-    start_y: f32,
-    sample_w: usize,
-    sample_h: usize,
-    cell_size: f32,
-) -> Vec<bool> {
-    let size = sample_w * sample_h;
-    let mut border_grid = vec![false; size];
-    let index_fn = |i: usize, j: usize| j * sample_w + i;
-
-    for j in (0..sample_h).step_by(2) {
-        for i in (0..sample_w).step_by(2) {
-            let index = index_fn(i, j);
-            if border_grid[index] {
-                continue;
-            }
-
-            let point = Vec2::new(
-                start_x + (i as f32) * cell_size,
-                start_y + (j as f32) * cell_size,
-            );
-            if !is_in_polygon(point, polygon) {
-                // We don't care about assigning the same index twice if it saves us from an extra branching
-                border_grid[index] = true;
-                let i_min = i.checked_sub(1).unwrap_or(0);
-                let i_plus = (i + 1).min(sample_w - 1);
-                let j_min = j.checked_sub(1).unwrap_or(0);
-                let j_plus = (j + 1).min(sample_h - 1);
-                // perpendicular
-                border_grid[index_fn(i_min, j)] = true;
-                border_grid[index_fn(i, j_min)] = true;
-                border_grid[index_fn(i_plus, j)] = true;
-                border_grid[index_fn(i, j_plus)] = true;
-                // diagonal
-                border_grid[index_fn(i_min, j_min)] = true;
-                border_grid[index_fn(i_min, j_plus)] = true;
-                border_grid[index_fn(i_plus, j_min)] = true;
-                border_grid[index_fn(i_plus, j_plus)] = true;
-            }
-        }
-    }
-
-    border_grid
 }
