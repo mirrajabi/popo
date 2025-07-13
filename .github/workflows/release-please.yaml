@@ -1,0 +1,48 @@
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+name: release-please
+
+jobs:
+  release-please:
+    runs-on: ubuntu-latest
+    outputs:
+      release_created: ${{ steps.release.outputs.release_created }}
+      tag_name: ${{ steps.release.outputs.tag_name }}
+    steps:
+      - name: Run release-please
+        uses: googleapis/release-please-action@v4
+        id: release
+        with:
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
+  
+  test:
+    uses: ./.github/workflows/test.yaml
+
+  publish-library:
+    needs: 
+      - release-please
+      - test
+    if: ${{ needs.release-please.outputs.release_created == 'true' && needs.test.result == 'success' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Login into crates.io
+        run: cargo login ${{ secrets.CRATES_IO }}
+      - name: Build binaries in "release" mode
+        run: cargo build -r
+      - name: "Package for crates.io"
+        run: cargo package # publishes a package as a tarball
+      - name: "Publish to crates.io"
+        run: cargo publish # publishes your crate as a library that can be added as a dependency
