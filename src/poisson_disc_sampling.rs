@@ -161,20 +161,8 @@ pub fn sample(
                 let cell_x = ((candidate.x - min_x) / cell_size).floor() as usize;
                 let cell_y = ((candidate.y - min_y) / cell_size).floor() as usize;
                 if is_valid(
-                    candidate,
-                    &polygon,
-                    min_x,
-                    max_x,
-                    min_y,
-                    max_y,
-                    sample_w,
-                    sample_h,
-                    cell_x,
-                    cell_y,
-                    r,
-                    &points,
-                    &grid,
-                    index_fn,
+                    candidate, &polygon, min_x, max_x, min_y, max_y, sample_w, sample_h, cell_x,
+                    cell_y, r, &points, &grid, index_fn,
                 ) {
                     points.push(candidate);
                     active_list.push(candidate);
