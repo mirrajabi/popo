@@ -46,7 +46,7 @@ let samples: Vec<Vec2> = sample(polygon, 0.1, 30, Some(0.01), None).take(10).col
 
 | Positive (Inwards) padding | No padding | Negative (Outwards) padding |
 | --------------- | --------------- | ---------- |
-| ![Inwards padding](./docs/images/padding-positive.png) | ![No padding](./docs/images/padding-none.png) | ![Outwards padding](./docs/images/padding-negative.png) |
+| ![Inwards padding](https://raw.githubusercontent.com/mirrajabi/popo/refs/heads/main/docs/images/padding-positive.png) | ![No padding](https://raw.githubusercontent.com/mirrajabi/popo/refs/heads/main/docs/images/padding-none.png) | ![Outwards padding](https://raw.githubusercontent.com/mirrajabi/popo/refs/heads/main/docs/images/padding-negative.png) |
 
 ### How fast is it?
 
